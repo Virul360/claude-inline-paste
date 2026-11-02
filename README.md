@@ -1,18 +1,16 @@
 # inline-paste
 
-A Claude Code mod that keeps short and medium pastes editable.
+[![Release](https://img.shields.io/github/v/release/Virul360/claude-inline-paste?include_prereleases&label=release)](https://github.com/Virul360/claude-inline-paste/releases)
+[![Tests](https://github.com/Virul360/claude-inline-paste/actions/workflows/test.yml/badge.svg)](https://github.com/Virul360/claude-inline-paste/actions/workflows/test.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Virul360/claude-inline-paste/blob/main/LICENSE)
 
-Claude Code folds any paste over 800 characters (or with more than 2 line breaks) into a `[Pasted text #1 +N lines]` placeholder, so you can't read or edit it before sending. That includes long voice dictations, since most dictation apps insert text by pasting.
+A [Claude Code](https://claude.com/claude-code) mod that keeps pastes and voice dictations editable in the prompt box.
 
-With this mod, any paste of **2,500 characters or less** is put back into the prompt box as plain text you can edit. Longer pastes stay folded as usual.
+Claude Code folds any paste over 800 characters (or with more than 2 line breaks) into a `[Pasted text #1 +N lines]` placeholder, so you can't read or edit it before you send. That includes long voice dictations, because most dictation apps insert text by pasting.
 
-## How it works
+With this mod, a paste up to a **limit you choose** is put back into the prompt box as plain text you can edit. Longer pastes stay folded as usual.
 
-When a new `[Pasted text #N …]` placeholder appears, the mod reads the clipboard with `pbpaste`. If the clipboard text is 2,500 characters or less and its line breaks match the placeholder's line count, the mod replaces the placeholder with the full text. Otherwise it leaves the placeholder alone.
-
-Everything runs locally. Nothing is sent anywhere, and the text Claude receives is the same either way.
-
-## Install
+## Installation
 
 At the prompt of a Claude Code terminal session:
 
@@ -20,7 +18,7 @@ At the prompt of a Claude Code terminal session:
 /plugin install inline-paste --marketplace Virul360/claude-inline-paste
 ```
 
-Answer `y` to add the marketplace, then pick a scope (user scope loads it in every session).
+Answer `y` to add the marketplace, then pick a scope (the user scope loads it in every session).
 
 From a shell:
 
@@ -28,16 +26,61 @@ From a shell:
 claude plugin install inline-paste --marketplace Virul360/claude-inline-paste
 ```
 
-In the desktop app, where `/plugin` does not run: click + next to the prompt box, then Plugins, Add marketplace with `Virul360/claude-inline-paste`, then Add plugin.
+In the desktop app, where `/plugin` does not run: click **+** next to the prompt box, then **Plugins**, **Add marketplace** with `Virul360/claude-inline-paste`, then **Add plugin**.
 
-## Notes and limits
+## Configuration
 
-- **macOS only.** It uses `pbpaste`, and reads the clipboard of the machine running Claude Code (so not over SSH).
-- **Dictation apps that restore your clipboard** after pasting may leave the text folded, because the clipboard no longer matches. Pasting the same text a second time also expands a placeholder (a built-in Claude Code feature).
-- **Text swapped in reads as typed text**, not as a marked paste.
-- **Change the limit** by editing `INLINE_LIMIT` in `hooks/register.ts`.
-- Claude Code's mod API is early access. If an update changes it, the mod most likely just stops expanding pastes.
+**The limit is yours to set.** The default of **2,500 characters** (about a minute of dictation) is just the author's choice. Claude Code asks for the value when you install the mod, and you can change it any time in `/config`.
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `maxChars` | `2500` | Pastes up to this many characters are shown in full. Longer ones stay folded. Any value from 1 to 100,000. |
+| `debug` | `false` | Prints a dim line in the transcript saying why each paste was or wasn't expanded. |
+
+You can also set the options in `~/.claude/settings.json`:
+
+```json
+{
+  "pluginConfigs": {
+    "inline-paste@claude-inline-paste": {
+      "options": { "maxChars": 10000 }
+    }
+  }
+}
+```
+
+## How it works
+
+1. You paste or dictate, and Claude Code folds the text into a `[Pasted text #N +M lines]` placeholder as it normally does.
+2. The mod sees the new placeholder and reads the clipboard with `pbpaste`.
+3. If the clipboard text is within your limit **and** its line breaks match the placeholder's line count, the mod swaps the placeholder for the full text. Otherwise it leaves the placeholder alone.
+
+Everything runs locally. Nothing is sent anywhere, and Claude receives the same text either way: Claude Code expands placeholders when you send.
+
+## Limitations
+
+- **macOS only.** It uses `pbpaste`, and reads the clipboard of the machine running Claude Code, so it won't help over SSH.
+- **Dictation apps that restore your clipboard** after pasting can leave the text folded, because the clipboard no longer matches. Pasting the same text a second time also expands a placeholder (a built-in Claude Code feature).
+- **Swapped-in text is sent as typed text,** not as a marked paste. That's what you want for dictation. Keep it in mind for copied third-party content, such as emails or web pages.
+- **Claude Code's mod API is early access.** If a future release changes it, the most likely result is that the mod quietly stops expanding pastes, and you're back to placeholders.
+
+## Development
+
+Clone the repo and load it straight from the folder:
+
+```
+claude --plugin-dir ./claude-inline-paste
+```
+
+Run the checks the CI runs:
+
+```
+claude plugin validate .
+claude plugin test .
+```
+
+The logic that decides whether to expand a paste is in [`hooks/paste.ts`](hooks/paste.ts), with no engine calls, so it's easy to test. The hook that wires it to Claude Code is in [`hooks/register.ts`](hooks/register.ts).
 
 ## License
 
-MIT
+[MIT](LICENSE)

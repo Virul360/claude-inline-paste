@@ -1,5 +1,13 @@
 {
   "name": "claude-inline-paste",
-  "owner": { "name": "Virul360" },
-  "plugins": [{ "name": "inline-paste", "source": "./" }]
+  "owner": {
+    "name": "Virul360"
+  },
+  "description": "inline-paste: keeps pastes and voice dictations editable in the Claude Code prompt box.",
+  "plugins": [
+    {
+      "name": "inline-paste",
+      "source": "./"
+    }
+  ]
 }

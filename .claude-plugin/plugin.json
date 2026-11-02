@@ -1,9 +1,28 @@
 {
   "name": "inline-paste",
-  "version": "0.1.0",
-  "description": "Shows pastes and dictations up to 2,500 characters in full in the prompt box instead of a [Pasted text] placeholder.",
+  "version": "0.2.0",
+  "description": "Keeps pastes and voice dictations editable: anything up to a limit you choose (2,500 characters by default) is shown in full in the prompt box instead of a [Pasted text] placeholder.",
   "author": {
     "name": "Virul360"
   },
-  "license": "MIT"
+  "homepage": "https://github.com/Virul360/claude-inline-paste",
+  "repository": "https://github.com/Virul360/claude-inline-paste",
+  "license": "MIT",
+  "keywords": ["paste", "dictation", "voice", "prompt", "macos"],
+  "userConfig": {
+    "maxChars": {
+      "type": "number",
+      "title": "Largest paste to show in full (characters)",
+      "description": "Pastes up to this many characters are shown as editable text. Longer ones stay folded as [Pasted text]. Default 2500.",
+      "default": 2500,
+      "min": 1,
+      "max": 100000
+    },
+    "debug": {
+      "type": "boolean",
+      "title": "Debug lines",
+      "description": "Print a dim line in the transcript saying why each paste was or was not expanded.",
+      "default": false
+    }
+  }
 }
