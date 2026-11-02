@@ -1,0 +1,9 @@
+{
+  "name": "inline-paste",
+  "version": "0.1.0",
+  "description": "Shows pastes and dictations up to 2,500 characters in full in the prompt box instead of a [Pasted text] placeholder.",
+  "author": {
+    "name": "Virul360"
+  },
+  "license": "MIT"
+}
