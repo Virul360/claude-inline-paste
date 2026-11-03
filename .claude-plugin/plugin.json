@@ -1,6 +1,6 @@
 {
   "name": "inline-paste",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Keeps pastes and voice dictations editable: anything up to a limit you choose (2,500 characters by default) is shown in full in the prompt box instead of a [Pasted text] placeholder.",
   "author": {
     "name": "Virul360"
@@ -8,7 +8,7 @@
   "homepage": "https://github.com/Virul360/claude-inline-paste",
   "repository": "https://github.com/Virul360/claude-inline-paste",
   "license": "MIT",
-  "keywords": ["paste", "dictation", "voice", "prompt", "macos"],
+  "keywords": ["paste", "dictation", "voice", "wispr-flow", "prompt", "macos"],
   "userConfig": {
     "maxChars": {
       "type": "number",

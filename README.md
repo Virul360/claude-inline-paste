@@ -52,15 +52,28 @@ You can also set the options in `~/.claude/settings.json`:
 ## How it works
 
 1. You paste or dictate, and Claude Code folds the text into a `[Pasted text #N +M lines]` placeholder as it normally does.
-2. The mod sees the new placeholder and reads the clipboard with `pbpaste`.
-3. If the clipboard text is within your limit **and** its line breaks match the placeholder's line count, the mod swaps the placeholder for the full text. Otherwise it leaves the placeholder alone.
+2. The mod sees the new placeholder and looks for the full text in two places: the clipboard (with `pbpaste`) and, if you use Wispr Flow, its local dictation history.
+3. If one of them is within your limit **and** its line breaks match the placeholder's line count, the mod swaps the placeholder for the full text. You see the placeholder for a moment, then your text.
+4. If nothing matches, or the clipboard and a recent dictation both fit but differ, the mod leaves the placeholder alone rather than guess.
 
-Everything runs locally. Nothing is sent anywhere, and Claude receives the same text either way: Claude Code expands placeholders when you send.
+Nothing is sent anywhere, and Claude receives the same text either way: Claude Code expands placeholders when you send.
+
+## Voice dictation
+
+**[Wispr Flow](https://wisprflow.ai) works out of the box.** It restores your old clipboard right after it pastes, so the clipboard can't be used. Instead the mod reads the most recent dictations from Wispr Flow's history at `~/Library/Application Support/Wispr Flow/flow.sqlite`.
+
+- That read is **read-only and stays on your Mac**, using the system's `sqlite3`. It only happens when a folded placeholder appears.
+- That file holds your dictation history. The mod uses it only to recover the dictation you just made, and debug lines show lengths and counts, never your words.
+- If you don't use Wispr Flow, the file isn't there and the mod just uses the clipboard.
+- The database isn't a public Wispr Flow API. A Wispr Flow update could change it, and dictations would then stay folded.
+
+Other dictation apps work if they leave the text on the clipboard after pasting. Apps that restore the clipboard stay folded.
 
 ## Limitations
 
 - **macOS only.** It uses `pbpaste`, and reads the clipboard of the machine running Claude Code, so it won't help over SSH.
-- **Dictation apps that restore your clipboard** after pasting can leave the text folded, because the clipboard no longer matches. Pasting the same text a second time also expands a placeholder (a built-in Claude Code feature).
+- **If you use Wispr Flow, copied pastes expand about half a second later,** because the mod first checks that no dictation is landing.
+- **If a paste stays folded,** pasting the same text a second time also expands it (a built-in Claude Code feature).
 - **Swapped-in text is sent as typed text,** not as a marked paste. That's what you want for dictation. Keep it in mind for copied third-party content, such as emails or web pages.
 - **Claude Code's mod API is early access.** If a future release changes it, the most likely result is that the mod quietly stops expanding pastes, and you're back to placeholders.
 
@@ -79,7 +92,7 @@ claude plugin validate .
 claude plugin test .
 ```
 
-The logic that decides whether to expand a paste is in [`hooks/paste.ts`](hooks/paste.ts), with no engine calls, so it's easy to test. The hook that wires it to Claude Code is in [`hooks/register.ts`](hooks/register.ts).
+The logic that decides whether to expand a paste, and from which source, is in [`hooks/paste.ts`](hooks/paste.ts), with no engine calls, so it's easy to test. The hook that wires it to Claude Code is in [`hooks/register.ts`](hooks/register.ts).
 
 ## License
 
